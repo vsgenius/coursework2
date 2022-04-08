@@ -96,8 +96,8 @@ def get_user_field(user_id):
 def age_from(age_user, user_id):
     age = age_user.split('.')
     if len(age) < 3:
-        send_msg({'user_id': user_id, 'message': 'Возраст не указан. Укажите верхний предел','random_id': randrange(10 ** 7)})
-        return int(wait_msg())-5
+        send_msg({'user_id': user_id, 'message': 'Возраст не указан. Укажите Нижний предел','random_id': randrange(10 ** 7)})
+        return int(wait_msg().text)-5
     res = datetime.now().year - int(age[2])
     return res - 5
 
@@ -105,8 +105,8 @@ def age_from(age_user, user_id):
 def age_to(age_user, user_id):
     age = age_user.split('.')
     if len(age) < 3:
-        send_msg({'user_id': user_id, 'message': 'Возраст не указан. Укажите верхний предел','random_id': randrange(10 ** 7)})
-        return int(wait_msg())+5
+        send_msg({'user_id': user_id, 'message': 'Возраст не указан. Укажите Верхний предел','random_id': randrange(10 ** 7)})
+        return int(wait_msg().text)+5
     res = datetime.now().year - int(age[2])
     return res + 5
 
@@ -114,14 +114,14 @@ def age_to(age_user, user_id):
 def check_city(user_field, user_id):
     if user_field is None or user_field == '':
         send_msg({'user_id': user_id, 'message': 'Город не заполнен. Укажите в ответном сообщении','random_id': randrange(10 ** 7)})
-        return wait_msg()
+        return wait_msg().text
     return user_field['id']
 
 
 def check_country(user_field, user_id):
     if user_field is None or user_field == '':
         send_msg({'user_id': user_id, 'message': 'Страна не заполнена. Укажите в ответном сообщении','random_id': randrange(10 ** 7)})
-        return wait_msg()
+        return wait_msg().text
     return user_field['id']
 
 
@@ -134,12 +134,13 @@ def search_user(user_fields):
               'age_from': age_from(user_fields.get('bdate'), user_fields['id']),  # возраст от
               'age_to': age_to(user_fields.get('bdate'), user_fields['id']),  # возраст до
               'sex': (1 if user_fields.get('sex') == 2 else 2)}  # указать пол
-    if not check_city(user_fields.get('city'), user_fields['id']):
-        params['hometown'] = check_city(user_fields.get('city'), user_fields['id']) # указать город
+    city = check_city(user_fields.get('city'), user_fields['id'])
+    if not city.isdigit():
+        params['hometown'] = city # указать город
     else: params['city'] = user_fields['city']['id']
-    print(params)
     user_lists = vk_find.method('users.search', params)
     return user_lists['items']
+
 
 def bot_answer(event):
     request = event.text
